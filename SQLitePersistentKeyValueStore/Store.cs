@@ -130,7 +130,7 @@ namespace SQLitePersistentKeyValueStore
                 return cache[key];
             }
 
-            using (var con = new SQLiteConnection($"Data Source={DatabasePath};Version=3;"))
+            using (var con = new SQLiteConnection(getConnectionString()))
             {
                 con.Open();
                 var SelectCommand = new SQLiteCommand();
@@ -166,7 +166,7 @@ namespace SQLitePersistentKeyValueStore
 
             Directory.CreateDirectory(Path.GetDirectoryName(DatabasePath));
 
-            using (var con = new SQLiteConnection($"Data Source={DatabasePath};Version=3;"))
+            using (var con = new SQLiteConnection(getConnectionString()))
             {
                 con.Open();
                 var CreateCommand = new SQLiteCommand("CREATE TABLE IF NOT EXISTS data (key TEXT PRIMARY KEY NOT NULL, value BLOB)", con);
@@ -209,7 +209,7 @@ namespace SQLitePersistentKeyValueStore
                     // Clear the queue
                 }
 
-                using (var source = new SQLiteConnection($"Data Source={tempFile}; Version=3;"))
+                using (var source = new SQLiteConnection(getConnectionString(tempFile)))
                 using (var destination = new SQLiteConnection(getConnectionString()))
                 {
                     source.Open();
