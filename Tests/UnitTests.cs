@@ -21,8 +21,6 @@ namespace Tests
                 myStore.Put(key, value);
             }
 
-            Thread.Sleep(1000);
-
             using (var myStore = new Store(tempFile))
             {
                 var actualStoredValue = myStore.Get(key);

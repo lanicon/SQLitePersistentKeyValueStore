@@ -226,6 +226,13 @@ namespace SQLitePersistentKeyValueStore
 
         void IDisposable.Dispose()
         {
+
+            // If the writer is still going, wait for it to finish
+            while (writerTask != null && !writerTask.IsCompleted)
+            {
+                Task.Delay(1);
+            }
+
             // See https://stackoverflow.com/questions/8511901/system-data-sqlite-close-not-releasing-database-file
             GC.Collect();
             GC.WaitForPendingFinalizers();
