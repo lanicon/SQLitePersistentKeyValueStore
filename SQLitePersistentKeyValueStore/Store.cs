@@ -12,7 +12,7 @@ namespace SQLitePersistentKeyValueStore
     /// 
     /// Current speed ups are possible - see akavache optimizations.
     /// </summary>
-    public class Store
+    public class Store : IDisposable
     {
         public string DatabasePath { get; private set; }
 
@@ -193,6 +193,7 @@ namespace SQLitePersistentKeyValueStore
 
             return fileAsBytes;
         }
+
         public void Restore(byte[] backupFile)
         {
 
@@ -223,6 +224,12 @@ namespace SQLitePersistentKeyValueStore
 
         }
 
+        void IDisposable.Dispose()
+        {
+            // See https://stackoverflow.com/questions/8511901/system-data-sqlite-close-not-releasing-database-file
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
 
         public Store(string databasePath)
         {
