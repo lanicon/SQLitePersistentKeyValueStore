@@ -1,4 +1,6 @@
 ﻿# SQLite Persistent Key Value Store (for C#)
+ 
+This can be downloaded from [nuget.org](https://www.nuget.org/packages/SQLitePersistentKeyValueStore)
 
 ## What problem does it solve?
 
