@@ -20,33 +20,54 @@ I think the best way to use this is to create a settings class that makes use of
 * The settings are persisted in the background - you can set and forget.
 
 In this example, we have a simple class that stores only one value; the IP Address of some host.
+Note that in this example we must force the disposal of the store to ensure all persistence tasks are finished before the program exits.
 
 ```c#
 
-public class Settings : IDisposable
+using System;
+using System.Net;
+using System.Text;
+
+namespace ExampleConsoleApp
 {
-
-    private SQLitePersistentKeyValueStore.Store store;
-
-    public Settings()
+    class Program
     {
-        store = new SQLitePersistentKeyValueStore.Store(".\\settings.db");
+        static void Main(string[] args)
+        {
+
+            var mySettings = new Settings();
+            mySettings.HostIPAddress = IPAddress.Parse("10.1.1.1");
+            mySettings.Dispose();
+
+        }
     }
 
-    ~Settings()
+    public class Settings : IDisposable
     {
-        Dispose();
-    }
 
-    public void Dispose()
-    {
-        store.Dispose();
-    }
+        private SQLitePersistentKeyValueStore.Store store;
 
-    public IPAddress HostIPAddress
-    {
-        get => IPAddress.Parse(Encoding.UTF8.GetString(store.Get("host_ip_address")));
-        set => store.Put("host_ip_address", Encoding.UTF8.GetBytes(value.ToString()));
+        public Settings()
+        {
+            store = new SQLitePersistentKeyValueStore.Store(".\\settings.db");
+        }
+
+        ~Settings()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            store.Dispose();
+        }
+
+        public IPAddress HostIPAddress
+        {
+            get => IPAddress.Parse(Encoding.UTF8.GetString(store.Get("host_ip_address")));
+            set => store.Put("host_ip_address", Encoding.UTF8.GetBytes(value.ToString()));
+        }
+
     }
 
 }
