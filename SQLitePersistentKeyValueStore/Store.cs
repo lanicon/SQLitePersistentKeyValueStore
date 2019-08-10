@@ -11,6 +11,7 @@ namespace SQLitePersistentKeyValueStore
     /// Keys are stored as TEXT, Values are stored as binary blobs.
     /// 
     /// Current speed ups are possible - see akavache optimizations.
+    /// We should also do something about the task array, probably not very memory efficient
     /// </summary>
     public class Store : IDisposable
     {
@@ -33,16 +34,12 @@ namespace SQLitePersistentKeyValueStore
 
         private ConcurrentQueue<string> persistenceQueue = new ConcurrentQueue<string>();
 
-        Task writerTask;
+        List<Task> writerTasks = new List<Task>();
 
         private void persist(string key, byte[] value)
         {
             persistenceQueue.Enqueue(key);
-
-            if (writerTask == null || writerTask.IsCompleted)
-            {
-                writerTask = Task.Run(() => writer());
-            }
+            writerTasks.Add(Task.Run(() => writer()));
         }
 
         private void writer()
@@ -68,27 +65,24 @@ namespace SQLitePersistentKeyValueStore
                     {
 
                         InsertCommand.Transaction = tr;
-                        foreach (var iter in persistenceQueue)
+                        DeleteCommand.Transaction = tr;
+
+                        string key;
+                        while (persistenceQueue.TryDequeue(out key))
                         {
-
-                            string key;
-                            if (persistenceQueue.TryDequeue(out key))
+                            if (!cache.ContainsKey(key))
                             {
-                                if (!cache.ContainsKey(key))
-                                {
-                                    DeleteCommand.Parameters.AddWithValue("@key", key);
-                                    DeleteCommand.ExecuteNonQuery();
-                                }
-                                else
-                                {
-                                    InsertCommand.Parameters.AddWithValue("@key", key);
-                                    InsertCommand.Parameters.AddWithValue("@value", cache[key]);
-                                    InsertCommand.ExecuteNonQuery();
-                                }
-
+                                DeleteCommand.Parameters.AddWithValue("@key", key);
+                                DeleteCommand.ExecuteNonQuery();
                             }
-
+                            else
+                            {
+                                InsertCommand.Parameters.AddWithValue("@key", key);
+                                InsertCommand.Parameters.AddWithValue("@value", cache[key]);
+                                InsertCommand.ExecuteNonQuery();
+                            }
                         }
+
                         tr.Commit();
 
                         SQLiteCommand VacuumCommand = new SQLiteCommand("VACUUM", con);
@@ -224,16 +218,16 @@ namespace SQLitePersistentKeyValueStore
 
         }
 
-        void IDisposable.Dispose()
+        ~Store()
         {
+            Dispose();
+        }
 
-            // If the writer is still going, wait for it to finish
-            while (writerTask != null && !writerTask.IsCompleted)
-            {
-                Task.Delay(1);
-            }
+        public void Dispose()
+        {
+            Task.WaitAll(writerTasks.ToArray());
 
-            // See https://stackoverflow.com/questions/8511901/system-data-sqlite-close-not-releasing-database-file
+            // See https://stackoverflow.com/questions/8511901/system-data-sqlite-close-not-releasing-database-file/39036464
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }

@@ -4,11 +4,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>timyhac</Authors>
     <Company />
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>A key value store that uses SQLite to persist data.</Description>
     <Copyright></Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>SQLite</PackageTags>
+    <RepositoryUrl>https://github.com/timyhac/SQLitePersistentKeyValueStore</RepositoryUrl>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
