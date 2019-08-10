@@ -27,6 +27,7 @@ Note that in this example we must force the disposal of the store to ensure all 
 using System;
 using System.Net;
 using System.Text;
+using SQLitePersistentKeyValueStore;
 
 namespace ExampleConsoleApp
 {
@@ -45,16 +46,11 @@ namespace ExampleConsoleApp
     public class Settings : IDisposable
     {
 
-        private SQLitePersistentKeyValueStore.Store store;
+        private Store store;
 
         public Settings()
         {
-            store = new SQLitePersistentKeyValueStore.Store(".\\settings.db");
-        }
-
-        ~Settings()
-        {
-            Dispose();
+            store = new Store(".\\settings.db");
         }
 
         public void Dispose()
