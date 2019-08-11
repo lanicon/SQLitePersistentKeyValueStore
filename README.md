@@ -55,9 +55,9 @@ namespace ExampleConsoleApp
             store = new Store(".\\settings.db");
         }
 
-        public void Dispose()
+        public void Flush()
         {
-            store.Dispose();
+            store.Flush();
         }
 
         public IPAddress HostIPAddress
