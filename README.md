@@ -40,7 +40,7 @@ namespace ExampleConsoleApp
 
             var mySettings = new Settings();
             mySettings.HostIPAddress = IPAddress.Parse("10.1.1.1");
-            mySettings.Dispose();
+            mySettings.Flush();
 
         }
     }
