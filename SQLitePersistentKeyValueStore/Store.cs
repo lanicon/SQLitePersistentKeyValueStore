@@ -225,6 +225,11 @@ namespace SQLitePersistentKeyValueStore
 
         public void Dispose()
         {
+            Flush();
+        }
+
+        public void Flush()
+        {
             Task.WaitAll(writerTasks.ToArray());
 
             // See https://stackoverflow.com/questions/8511901/system-data-sqlite-close-not-releasing-database-file/39036464
