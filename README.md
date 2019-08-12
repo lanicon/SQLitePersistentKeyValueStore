@@ -4,7 +4,7 @@ This can be downloaded from [nuget.org](https://www.nuget.org/packages/SQLitePer
 
 ## What problem does it solve?
 
-* Stores a small number of key-value pairs
+* Persists a small number of key-value pairs
 * that must be human-editable in their persisted form
 * and be accessed by multiple threads
 * It must be able to be restored and backed up while running on-the-fly
@@ -22,7 +22,7 @@ I think the best way to use this is to create a settings class that makes use of
 * The settings are persisted in the background - you can set and forget.
 
 In this example, we have a simple class that stores only one value; the IP Address of some host.
-Note that in this example we must force the disposal of the store to ensure all persistence tasks are finished before the program exits.
+Note that in this example we must force the flushing of the store to ensure all persistence tasks are finished before the program exits.
 
 ```c#
 
@@ -45,7 +45,7 @@ namespace ExampleConsoleApp
         }
     }
 
-    public class Settings : IDisposable
+    public class Settings
     {
 
         private Store store;
