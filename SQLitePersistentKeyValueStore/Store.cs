@@ -16,6 +16,7 @@ namespace SQLitePersistentKeyValueStore
     public class Store : IDisposable
     {
         public string DatabasePath { get; private set; }
+        public string Table { get; private set; }
 
         private string getConnectionString(string databasePath = null)
         {
@@ -54,11 +55,11 @@ namespace SQLitePersistentKeyValueStore
                     con.Open();
 
                     SQLiteCommand InsertCommand = new SQLiteCommand(con);
-                    InsertCommand.CommandText = "INSERT OR REPLACE INTO data (key, value) VALUES (@key, @value)";
+                    InsertCommand.CommandText = $"INSERT OR REPLACE INTO {Table} (key, value) VALUES (@key, @value)";
                     InsertCommand.Prepare();
 
                     SQLiteCommand DeleteCommand = new SQLiteCommand(con);
-                    DeleteCommand.CommandText = "DELETE FROM data WHERE key = @key";
+                    DeleteCommand.CommandText = $"DELETE FROM {Table} WHERE key = @key";
                     DeleteCommand.Prepare();
 
                     using (SQLiteTransaction tr = con.BeginTransaction())
@@ -128,7 +129,7 @@ namespace SQLitePersistentKeyValueStore
             {
                 con.Open();
                 var SelectCommand = new SQLiteCommand();
-                SelectCommand.CommandText = "SELECT value FROM data WHERE key = @key";
+                SelectCommand.CommandText = $"SELECT value FROM {Table} WHERE key = @key";
                 SelectCommand.Prepare();
                 SelectCommand.Connection = con;
 
@@ -163,7 +164,7 @@ namespace SQLitePersistentKeyValueStore
             using (var con = new SQLiteConnection(getConnectionString()))
             {
                 con.Open();
-                var CreateCommand = new SQLiteCommand("CREATE TABLE IF NOT EXISTS data (key TEXT PRIMARY KEY NOT NULL, value BLOB)", con);
+                var CreateCommand = new SQLiteCommand($"CREATE TABLE IF NOT EXISTS {Table} (key TEXT PRIMARY KEY NOT NULL, value BLOB)", con);
                 CreateCommand.ExecuteNonQuery();
             }
 
@@ -237,9 +238,10 @@ namespace SQLitePersistentKeyValueStore
             GC.WaitForPendingFinalizers();
         }
 
-        public Store(string databasePath)
+        public Store(string databasePath, string tableName = "data")
         {
             DatabasePath = databasePath;
+            Table = tableName;
             EnsureDatabaseCreated();
         }
 
