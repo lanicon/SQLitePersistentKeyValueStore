@@ -117,22 +117,18 @@ namespace SQLitePersistentKeyValueStore
             }
         }
 
-        public byte[] Get(string key)
+        private byte[] getFromDisk(string key)
         {
 
-            if (cache.ContainsKey(key))
-            {
-                return cache[key];
-            }
+            var SelectCommand = new SQLiteCommand();
+            SelectCommand.CommandText = $"SELECT value FROM {Table} WHERE key = @key";
+            SelectCommand.Prepare();
 
             using (var con = new SQLiteConnection(getConnectionString()))
             {
                 con.Open();
-                var SelectCommand = new SQLiteCommand();
-                SelectCommand.CommandText = $"SELECT value FROM {Table} WHERE key = @key";
-                SelectCommand.Prepare();
-                SelectCommand.Connection = con;
 
+                SelectCommand.Connection = con;
                 SelectCommand.Parameters.AddWithValue("@key", key);
                 SelectCommand.ExecuteNonQuery();
 
@@ -149,9 +145,21 @@ namespace SQLitePersistentKeyValueStore
                     {
                         throw new KeyNotFoundException(key);
                     }
-
                 }
+            }
 
+        }
+
+        public byte[] Get(string key)
+        {
+
+            if (cache.ContainsKey(key))
+            {
+                return cache[key];
+            }
+            else
+            {
+                return getFromDisk(key);
             }
 
         }
