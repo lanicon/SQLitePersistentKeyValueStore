@@ -58,8 +58,7 @@ namespace SQLitePersistentKeyValueStore
                         InsertCommand.Transaction = tr;
                         DeleteCommand.Transaction = tr;
 
-                        string key;
-                        while (persistenceQueue.TryDequeue(out key))
+                        while (persistenceQueue.TryDequeue(out string key))
                         {
                             if (!cache.ContainsKey(key))
                             {
@@ -97,14 +96,10 @@ namespace SQLitePersistentKeyValueStore
 
         public void Delete(string key)
         {
-            if (!cache.TryRemove(key, out byte[] _))
-            {
+            if (!cache.TryRemove(key, out _))
                 throw new KeyNotFoundException(key);
-            }
             else
-            {
                 persist(key, null);
-            }
         }
 
         private byte[] getFromDisk(string key)
@@ -131,7 +126,7 @@ namespace SQLitePersistentKeyValueStore
                         cache[key] = value;
                         return value;
                     }
-                    catch (InvalidOperationException e)
+                    catch (InvalidOperationException)
                     {
                         throw new KeyNotFoundException(key);
                     }
@@ -212,14 +207,10 @@ namespace SQLitePersistentKeyValueStore
         }
 
         ~Store()
-        {
-            Dispose();
-        }
+            => Dispose();
 
         public void Dispose()
-        {
-            Flush();
-        }
+            => Flush();
 
         public void Flush()
         {
