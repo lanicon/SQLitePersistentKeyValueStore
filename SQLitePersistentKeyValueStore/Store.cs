@@ -192,7 +192,7 @@ namespace SQLitePersistentKeyValueStore
 
                 // Because of the nature of this operation, it makes sense to delete any current values that are waiting for persistence, or have already been cached.
                 cache.Clear();
-                while (persistenceQueue.TryDequeue(out string _))
+                while (persistenceQueue.TryDequeue(out _))
                 {
                     // Clear the queue
                 }
