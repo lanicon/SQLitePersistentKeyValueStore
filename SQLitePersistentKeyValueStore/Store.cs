@@ -152,16 +152,10 @@ namespace SQLitePersistentKeyValueStore
 
         public byte[] Get(string key)
         {
-
-            if (cache.ContainsKey(key))
-            {
-                return cache[key];
-            }
+            if (cache.TryGetValue(key, out byte[] value))
+                return value;
             else
-            {
                 return getFromDisk(key);
-            }
-
         }
 
         private void EnsureDatabaseCreated()
