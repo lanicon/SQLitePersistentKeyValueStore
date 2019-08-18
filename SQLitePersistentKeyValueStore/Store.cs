@@ -19,17 +19,7 @@ namespace SQLitePersistentKeyValueStore
         public string Table { get; private set; }
 
         private string getConnectionString(string databasePath = null)
-        {
-            if (databasePath == null)
-            {
-                return $"Data Source={DatabasePath};Version=3;";
-
-            }
-            else
-            {
-                return $"Data Source={databasePath};Version=3;";
-            }
-        }
+            => $"Data Source={databasePath ?? DatabasePath};Version=3;";
 
         private ConcurrentDictionary<string, byte[]> cache = new ConcurrentDictionary<string, byte[]>();
 
